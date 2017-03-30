@@ -16,7 +16,9 @@ def index():
 
 @site_views.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method=='GET':
+    if current_user.is_authenticated:
+        return redirect(url_for('site_views.logged'))
+    elif request.method=='GET':
         return render_template('register.jinja')
     else:
         email = request.form['email']
@@ -30,6 +32,8 @@ def register():
 
 @site_views.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('site_views.logged'))
     if request.method=='GET':
         return render_template('login.jinja')
     else:
@@ -47,7 +51,7 @@ def login():
 def logged():
     return render_template('logged.jinja', user=User.query.get(current_user.get_id()))
 
-@site_views.route('/logged', methods=['GET'])
+@site_views.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()
