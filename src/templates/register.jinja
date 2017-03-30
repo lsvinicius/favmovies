@@ -1,0 +1,14 @@
+{% extends 'base.jinja' %}
+{% block content %}
+    <form action="/register" method="POST">
+        First name: <br>
+        <input type="text" name="firstname"/> <br>
+        Last name: <br>
+        <input type="text" name="lastname"/> <br>
+        E-mail: <br>
+        <input type="email" name="email"/> <br>
+        Password: <br>
+        <input type="password" name="password"> <br>
+        <input type="submit" value="Register"/>
+    </form>
+{% endblock %}
