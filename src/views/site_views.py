@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import hashlib
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
 from src.database import db
-import hashlib
+from src.omdbapi import query_omdb
 
 site_views = Blueprint('site_views', __name__, template_folder='templates')
 
@@ -56,6 +57,17 @@ def logged():
 def logout():
     logout_user()
     return redirect(url_for('site_views.index'))
+
+@site_views.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    if request.method == 'GET':
+        return render_template('search.jinja', response=None)
+    else:
+        s = request.form['title']
+        params= { 's': s }
+        response = query_omdb(params)
+        return render_template('search.jinja', response=response)
 
 def hash_password(password):
     return hashlib.sha512(password.encode('utf-8')).hexdigest()

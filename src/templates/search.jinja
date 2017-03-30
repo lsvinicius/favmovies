@@ -1,0 +1,25 @@
+{%extends 'base.jinja'%}
+{% block content %}
+<form action="/search" method="post">
+    Movie title: <input type="text" name="title"> <br>
+    <input type="submit" value="Search"/>
+</form>
+{% if response %}
+  {% if response.get('Response') %}
+    <form action="/favmovies" method="post">
+        <ul>
+        {% for movie in response.get('Search') %}
+            <li>
+            <img src="{{ movie['Poster'] }}" alt="poster image" width="90" height="90"/> <br>
+            {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
+            <input type="checkbox" name="movies" value="{{movie['imdbID']}}"/>Check me!!! <br> <br>
+            </li>
+        {% endfor %}
+        </ul>
+        <input type="submit" value="Add checkeds to favs"/>
+    </form>
+  {% else %}
+    <p>{{ response.get("Error") }}</p>
+  {% endif %}
+{% endif %}
+{% endblock %}
