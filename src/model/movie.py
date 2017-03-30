@@ -9,17 +9,19 @@ class Movie(db.Model):
     poster = db.Column(db.String(500), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comment = db.Column(db.String(10000))
+    year = db.Column(db.Integer)
 
     @property
     def serialize(self):
         return {
             'imdbID': self.imdbID,
-            'title': self.title,
-            'plot': self.plot,
-            'type': self.type,
-            'poster': self.poster,
+            'Title': self.title,
+            'Plot': self.plot,
+            'Type': self.type,
+            'Poster': self.poster,
             'user_id': self.user_id,
-            'comment': self.comment
+            'Comment': self.comment,
+            'Year': self.year
         }
 
     def __str__(self):

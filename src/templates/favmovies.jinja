@@ -7,7 +7,9 @@
             <ul>
             {% for movie in response.get('favmovies') %}
                 <li>
-                <img src="{{ movie['Poster'] }}" alt="poster image" width="90" height="90"/> <br>
+                <a href="#">
+                    <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
+                </a> <br>
                 {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
                 </li>
             {% endfor %}

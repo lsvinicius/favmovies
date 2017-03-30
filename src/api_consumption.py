@@ -2,7 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 HOST_ADDRESS = 'localhost'
-PORT = '5000'
+PORT = '5001'
 HTTP_ADDRESS = 'http://' + HOST_ADDRESS + ':' + PORT
 FAVMOVIES_RESTFUL_PATH = '/restful/favmovies'
 FULL_ADDRESS = HTTP_ADDRESS+FAVMOVIES_RESTFUL_PATH
@@ -22,9 +22,7 @@ def favmovies_call(user, method='GET', params=None):
         if method == 'GET':
             response = requests.get(FULL_ADDRESS+'/'+user.get_id())
         elif method == 'POST':
-            print(FULL_ADDRESS+'/'+user.get_id())
-            response = requests.get(HTTP_ADDRESS)
-            print('RESPONDEU')
+            response = requests.post(FULL_ADDRESS+'/'+user.get_id(), data={'movies':params})
         response = response.json()
     except requests.exceptions.RequestException as e:
         pass

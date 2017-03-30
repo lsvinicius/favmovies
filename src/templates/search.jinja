@@ -10,7 +10,7 @@
         <ul>
         {% for movie in response.get('Search') %}
             <li>
-            <img src="{{ movie['Poster'] }}" alt="poster image" width="90" height="90"/> <br>
+            <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/> <br>
             {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
             <input type="checkbox" name="movies" value="{{movie['imdbID']}}"/>Check me!!! <br> <br>
             </li>

@@ -77,7 +77,7 @@ def favmovies():
         response = favmovies_call(user=current_user)
         return render_template('favmovies.jinja', response=response)
     elif request.method == 'POST':
-        response = favmovies_call(user=current_user, method='POST', params=request.form)
+        response = favmovies_call(user=current_user, method='POST', params=request.form.getlist('movies'))
         return render_template('added_favmovies.jinja', response=response)
     elif request.method == 'PUT':
         return 'calling put'

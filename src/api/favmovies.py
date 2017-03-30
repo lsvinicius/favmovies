@@ -16,11 +16,12 @@ def favmovies_post(user_id):
     user = User.query.get(user_id)
     checked_movies = request.form.getlist('movies')
     added_movies = []
+    print(checked_movies)
     for imdbID in checked_movies:
         result = query_omdb({'i': imdbID})
         if result.get('Response'):
             movie = Movie(imdbID=result['imdbID'],
-                          title=result['Title'], plot=result['Plot'], type=result['Type'], poster=result['Poster'])
+                          title=result['Title'], plot=result['Plot'], type=result['Type'], poster=result['Poster'], year=result['Year'])
             if user.get_movie_by_imdbID(movie.imdbID) is None:
                 user.movies.append(movie)
                 added_movies.append(movie)

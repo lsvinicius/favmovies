@@ -2,13 +2,11 @@ from flask import Flask
 from flask_login import LoginManager
 from src.database import db
 from src.views.site_views import site_views
-from src.api.favmovies import favmovies
 from src.model.user import User
 import os
 
 app = Flask(__name__)
 app.register_blueprint(site_views)
-app.register_blueprint(favmovies)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -27,4 +25,4 @@ def load_user(id):
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
