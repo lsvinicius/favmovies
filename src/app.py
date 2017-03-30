@@ -20,8 +20,8 @@ def setup_database():
     db.create_all()
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.filter_by(id=int(user_id)).first()
+def load_user(id):
+    return User.query.get(id)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)
