@@ -4,7 +4,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
 from src.database import db
-from src.omdbapi import query_omdb
+from src.api_consumption import query_omdb, favmovies_call
 
 site_views = Blueprint('site_views', __name__, template_folder='templates')
 
@@ -68,6 +68,21 @@ def search():
         params= { 's': s }
         response = query_omdb(params)
         return render_template('search.jinja', response=response)
+
+@site_views.route('/favmovies', methods=['GET', 'POST'])
+@site_views.route('/favmovies/<id>', methods=['PUT', 'DELETE'])
+@login_required
+def favmovies():
+    if request.method == 'GET':
+        response = favmovies_call(user=current_user)
+        return render_template('favmovies.jinja', response=response)
+    elif request.method == 'POST':
+        response = favmovies_call(user=current_user, method='POST', params=request.form)
+        return render_template('added_favmovies.jinja', response=response)
+    elif request.method == 'PUT':
+        return 'calling put'
+    elif request.method == 'DELETE':
+        return 'calling delete'
 
 def hash_password(password):
     return hashlib.sha512(password.encode('utf-8')).hexdigest()

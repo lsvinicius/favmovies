@@ -6,7 +6,7 @@
 </form>
 {% if response %}
   {% if response.get('Response') %}
-    <form action="/favmovies" method="post">
+    <form action="/favmovies" method="POST">
         <ul>
         {% for movie in response.get('Search') %}
             <li>

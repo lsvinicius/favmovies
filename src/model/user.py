@@ -16,7 +16,6 @@ class User(db.Model, UserMixin):
 
     def get_movie_by_imdbID(self, imdbID):
         result = self.movies.filter_by(imdbID=imdbID).first()
-        print(result)
         return result
 
     def __str__(self):
