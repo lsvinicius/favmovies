@@ -1,0 +1,17 @@
+{%extends 'base.jinja'%}
+{%block scripts%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/static/js/request.js"></script>
+{%endblock%}
+{%block content%}
+    <div id="movie">
+        <a id="address" href="http://localhost:5000/favmovies/{{movie['imdbID']}}">
+            <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
+        </a> <br>
+        <p>{{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}}</p>
+        <p>{{ movie['Plot'] }}</p>
+        <textarea rows="4" cols="50" id="comment">{{ movie['Comment'] }}</textarea><br>
+        <button id="delete">Delete me</button>
+        <button id="update">Update me</button>
+    </div>
+{% endblock %}
