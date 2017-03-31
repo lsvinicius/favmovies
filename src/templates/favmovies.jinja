@@ -3,17 +3,18 @@
     {% if response.get("Error") %}
         <p>{{ response.get("Error") }}</p>
     {% else %}
-        <form action="/favmovies" method="post">
-            <ul>
+        <ul>
             {% for movie in response.get('favmovies') %}
                 <li>
-                <a href="#">
-                    <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
-                </a> <br>
-                {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
+                    <a href="http://localhost:5000/favmovies/{{movie['imdbID']}}">
+                        <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
+                    </a> <br>
+                    {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
+                    <textarea rows="4" cols="50" readonly>{{ movie['Comment'] }}</textarea>
+                    <br>
+                    <br>
                 </li>
             {% endfor %}
-            </ul>
-        </form>
+        </ul>
     {% endif %}
 {%endblock%}
