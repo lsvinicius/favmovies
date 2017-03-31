@@ -1,9 +1,9 @@
-import hashlib
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
 from src.database import db
+from src.password import hash_password
 from src.api_consumption import query_omdb, favmovies_call
 from src.views.form_validators import valid_register_form
 
@@ -96,6 +96,3 @@ def favmovies(imdbID=None):
     elif request.method == 'DELETE': #called via ajax
         response = favmovies_call(user=current_user, method='DELETE', params={'imdbID':imdbID})
         return response['Response']
-
-def hash_password(password):
-    return hashlib.sha512(password.encode('utf-8')).hexdigest()
