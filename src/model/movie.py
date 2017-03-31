@@ -2,7 +2,7 @@ from src.database import db
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    imdbID = db.Column(db.String(100), nullable=False, unique=True)
+    imdbID = db.Column(db.String(100), nullable=False, unique=True) #not using snake_case to make it equal to the variable name used by omdbapi
     title = db.Column(db.String(200), nullable=False)
     plot = db.Column(db.String(10000), nullable=False)
     type = db.Column(db.String(50), nullable=False)

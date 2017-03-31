@@ -4,9 +4,9 @@ from src.model.movie import Movie
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(200))
-    password = db.Column(db.String(128))
-    email = db.Column(db.String(200), unique=True)
+    name = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(200), unique=True, nullable=False)
     movies = db.relationship('Movie', backref='user', lazy='dynamic')
 
     def __init__(self, name, password, email):
