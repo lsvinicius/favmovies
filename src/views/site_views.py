@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
 from src.database import db
 from src.api_consumption import query_omdb, favmovies_call
+from src.views.form_validators import valid_register_form
 
 site_views = Blueprint('site_views', __name__, template_folder='templates')
 
@@ -21,15 +22,17 @@ def register():
         return redirect(url_for('site_views.logged'))
     elif request.method=='GET':
         return render_template('register.jinja')
-    else:
+    elif valid_register_form(request.form):
         email = request.form['email']
-        name = request.form['firstname']+ ' ' + request.form['lastname']
+        name = request.form['firstname'].strip()+ ' ' + request.form['lastname'].strip()
         password = request.form['password']
         hashed_password = hash_password(password)
         user = User(name, hashed_password, email)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('site_views.login'))
+    else:
+        return redirect(url_for('site_views.register'))
 
 @site_views.route('/login', methods=['GET', 'POST'])
 def login():

@@ -26,6 +26,10 @@ def setup_database():
 def http_error_handler(error):
     return render_template('error.jinja', error=error), error.code
 
+@app.errorhandler(400)
+def bad_request_handler(error):
+    return render_template('bad_request.jinja', error=error.description), error.code
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(id)
