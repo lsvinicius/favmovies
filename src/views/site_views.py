@@ -1,5 +1,5 @@
 import hashlib
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
@@ -45,7 +45,7 @@ def login():
         password = hash_password(request.form['password'])
         user = User.query.filter_by(email=email, password=password).first()
         if user is None:
-            return redirect(url_for('site_views.login', error='Invalid login'))
+            abort(400, {'description':'Invalid login'})
         else:
             login_user(user)
             return redirect(url_for('site_views.logged'))
@@ -67,7 +67,9 @@ def search():
     if request.method == 'GET':
         return render_template('search.jinja', response=None)
     else:
-        s = request.form['title']
+        s = request.form.get('title')
+        if s is None or s == '':
+            abort(400, {'description':'Invalid title to be searched'})
         params= { 's': s }
         response = query_omdb(params)
         return render_template('search.jinja', response=response)
