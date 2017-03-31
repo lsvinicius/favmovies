@@ -2,13 +2,13 @@ import re
 from validate_email import validate_email
 from werkzeug.exceptions import HTTPException
 from flask import abort
-from src.model.movie import user
+from src.model.user import User
 
 def valid_register_form(form):
     is_valid = True
     is_valid = validate_email(form.get('email')) and is_valid
     if is_valid:
-        user = User.query.filter_by(email:form.get('email'))
+        user = User.query.filter_by(email=form.get('email')).first()
         if user:
             abort(400, {'description':'User already registered'})
     else:
