@@ -1,5 +1,5 @@
 import hashlib
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from src.model.user import User
@@ -50,7 +50,7 @@ def login():
 @site_views.route('/logged', methods=['GET'])
 @login_required
 def logged():
-    return render_template('logged.jinja', user=User.query.get(current_user.get_id()))
+    return render_template('logged.jinja', user=current_user)
 
 @site_views.route('/logout', methods=['GET'])
 @login_required
@@ -70,19 +70,27 @@ def search():
         return render_template('search.jinja', response=response)
 
 @site_views.route('/favmovies', methods=['GET', 'POST'])
-@site_views.route('/favmovies/<id>', methods=['PUT', 'DELETE'])
+@site_views.route('/favmovies/<imdbID>', methods=['GET', 'PUT', 'DELETE'])
 @login_required
-def favmovies():
+def favmovies(imdbID=None):
     if request.method == 'GET':
-        response = favmovies_call(user=current_user)
-        return render_template('favmovies.jinja', response=response)
+        if imdbID is None:
+            response = favmovies_call(user=current_user)
+            return render_template('favmovies.jinja', response=response)
+        else:
+            response = favmovies_call(user=current_user, params={'imdbID':imdbID})
+            return render_template('favmovie_single.jinja', movie=response)
     elif request.method == 'POST':
         response = favmovies_call(user=current_user, method='POST', params=request.form.getlist('movies'))
-        return render_template('added_favmovies.jinja', response=response)
-    elif request.method == 'PUT':
-        return 'calling put'
-    elif request.method == 'DELETE':
-        return 'calling delete'
+        return redirect(url_for('site_views.logged'))
+    elif request.method == 'PUT': #called via ajax
+        comment = request.form['comment']
+        response = favmovies_call(user=current_user, method='PUT',
+                                  params={'imdbID':imdbID, 'comment':comment})
+        return response['Response']
+    elif request.method == 'DELETE': #called via ajax
+        response = favmovies_call(user=current_user, method='DELETE', params={'imdbID':imdbID})
+        return response['Response']
 
 def hash_password(password):
     return hashlib.sha512(password.encode('utf-8')).hexdigest()

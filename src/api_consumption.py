@@ -1,6 +1,6 @@
 import requests
-from requests.auth import HTTPBasicAuth
 
+#Restful API address config
 HOST_ADDRESS = 'localhost'
 PORT = '5001'
 HTTP_ADDRESS = 'http://' + HOST_ADDRESS + ':' + PORT
@@ -18,13 +18,20 @@ def query_omdb(params):
 
 def favmovies_call(user, method='GET', params=None):
     response = {'Response':False, 'Error':'Something went wrong.'}
+    request_address = FULL_ADDRESS+'/'+user.get_id()
     try:
         if method == 'GET':
-            response = requests.get(FULL_ADDRESS+'/'+user.get_id())
+            if params is None:
+                response = requests.get(request_address)
+            else:
+                response = requests.get(request_address+'/'+params['imdbID'])
         elif method == 'POST':
-            response = requests.post(FULL_ADDRESS+'/'+user.get_id(), data={'movies':params})
+            response = requests.post(request_address, data={'movies':params})
+        elif method == 'PUT':
+            response = requests.put(request_address+'/'+params['imdbID'], data=params)
+        elif method == 'DELETE':
+            response = requests.delete(request_address+'/'+params['imdbID'])
         response = response.json()
     except requests.exceptions.RequestException as e:
         pass
-    print(response)
     return response
