@@ -1,5 +1,5 @@
-from flask_testing import TestCase, LiveServerTestCase
-from src import restful_app, app
+from flask_testing import TestCase
+from src import restful_app
 from src.password import hash_password
 from src import database
 from src.model.user import User
@@ -149,10 +149,3 @@ class RestfulTest(TestSetup):
         response = self.call_delete('2', 'imdbid')
         movie = Movie.query.get(1)
         assert movie is not None
-
-class FrontendTest(LiveServerTestCase):
-
-    def create_app(self):
-        app = app.create()
-        database.db.init(app)
-        return app
