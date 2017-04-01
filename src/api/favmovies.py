@@ -39,7 +39,7 @@ def favmovies_post(user_id):
         result = query_omdb({'i': imdbID})
         if result.get('Response') == "True":
             movie = Movie(imdbID=result['imdbID'],
-                          title=result['Title'], plot=result['Plot'], type=result['Type'], poster=result['Poster'], year=result['Year'])
+                          title=result['Title'], plot=result['Plot'], type=result['Type'], poster=result['Poster'], year=result['Year'], comment='')
             if user.get_movie_by_imdbID(movie.imdbID) is None:
                 user.movies.append(movie)
                 added_movies.append(movie)
