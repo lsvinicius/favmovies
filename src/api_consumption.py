@@ -1,5 +1,5 @@
 import requests
-
+from src.custom_log import custom_logger
 #Restful API address config
 HOST_ADDRESS = 'localhost'
 PORT = '5001'
@@ -13,7 +13,7 @@ def query_omdb(params):
         response = requests.get("http://www.omdbapi.com/?", params=params)
         response = response.json()
     except requests.exceptions.RequestException as e:
-        pass
+        custom_logger('query_omdb: exception raised {}'.format(e))
     return response
 
 def favmovies_call(user, method='GET', params=None):
@@ -33,5 +33,5 @@ def favmovies_call(user, method='GET', params=None):
             response = requests.delete(request_address+'/'+params['imdbID'])
         response = response.json()
     except requests.exceptions.RequestException as e:
-        pass
+        custom_logger('favmovies_call: exception raised {}'.format(e))
     return response

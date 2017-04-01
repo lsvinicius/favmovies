@@ -6,7 +6,7 @@ from src.database import db
 from src.password import hash_password
 from src.api_consumption import query_omdb, favmovies_call
 from src.views.form_validators import valid_register_form
-
+from src.custom_log import custom_logger
 site_views = Blueprint('site_views', __name__, template_folder='templates')
 
 @site_views.route('/', methods=['GET', 'POST'])
@@ -30,8 +30,10 @@ def register():
         user = User(name, hashed_password, email)
         db.session.add(user)
         db.session.commit()
+        custom_logger('register: user {} add'.format(user.email))
         return redirect(url_for('site_views.login'))
     else:
+        custom_logger('register: invalid form register, redirecting to register page. this probably means there is a bad request not aborted by valid_register_form', lvl=logging.DEBUG)
         return redirect(url_for('site_views.register'))
 
 @site_views.route('/login', methods=['GET', 'POST'])
@@ -78,11 +80,14 @@ def search():
 @site_views.route('/favmovies/<imdbID>', methods=['GET', 'PUT', 'DELETE'])
 @login_required
 def favmovies(imdbID=None):
+    custom_logger('favmovies: client issued {} request'.format(request.method))
     if request.method == 'GET':
         if imdbID is None:
+            custom_logger('favmovies: client issued GET request for movies list')
             response = favmovies_call(user=current_user)
             return render_template('favmovies.jinja', response=response)
         else:
+            custom_logger('favmovies: client issued GET request for single movie')
             response = favmovies_call(user=current_user, params={'imdbID':imdbID})
             return render_template('favmovie_single.jinja', movie=response)
     elif request.method == 'POST':

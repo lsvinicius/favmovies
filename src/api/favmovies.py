@@ -3,6 +3,7 @@ from src.model.user import User
 from src.model.movie import Movie
 from src.database import db
 from src.api_consumption import query_omdb
+from src.custom_log import custom_logger
 
 favmovies = Blueprint('favmovies', __name__, template_folder='templates')
 MOVIE_NOT_FOUND = {'Response':'Movie not found'}
@@ -12,8 +13,10 @@ USER_NOT_FOUND = {'Response':'User not found'}
 def favmovies_get(user_id):
     user = User.query.get(user_id)
     if user:
+        custom_logger('favmovies_get: getting user {}'.format(user.email))
         return jsonify(favmovies=[movie.serialize for movie in user.movies])
     else:
+        custom_logger('favmovies_get: user id {} not found'.format(user_id))
         return jsonify(USER_NOT_FOUND)
 
 @favmovies.route('/restful/favmovies/<user_id>/<imdbID>', methods=['GET'])
@@ -43,6 +46,8 @@ def favmovies_post(user_id):
             if user.get_movie_by_imdbID(movie.imdbID) is None:
                 user.movies.append(movie)
                 added_movies.append(movie)
+        else:
+            custom_logger('favmovies_post: movie id {} not found'.format(imdbID))
     db.session.commit()
     return jsonify(added_movies=[movie.serialize for movie in added_movies])
 
