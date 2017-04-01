@@ -40,7 +40,7 @@ class TestSetup(TestCase):
     def create_app(self):
         #using the same application database, this is not a problem,
         #since the application database is destroyed every time it starts up
-        app = restful_app.create_app()
+        app = restful_app.create_restful_app()
         database.db.init_app(app)
         return app
 

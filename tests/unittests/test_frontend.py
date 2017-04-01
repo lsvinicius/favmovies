@@ -6,11 +6,10 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from src import app as frontend_app
+from src import frontend_app
 from src import database
 from src.model.user import User
 from src.password import hash_password
-from src.app import load_user
 import os
 import subprocess
 
@@ -26,7 +25,7 @@ def load_user(id):
 class BaseDo(LiveServerTestCase):
 
     def create_app(self):
-        app = frontend_app.create_app()
+        app = frontend_app.create_frontend_app()
         app.secret_key = os.urandom(24)
         login_manager.init_app(app)
         login_manager.login_view = 'site_views.login'
@@ -175,13 +174,13 @@ class FrontendTest(BaseDo):
         firstname.send_keys('0123')
         submit.click()
         #The returned content is not handled by method
-        #app.bad_request_handler.
+        #frontend_app.bad_request_handler.
         #For the current situation, we will handle the
         #Bad Request issued by Firefox manually, however,
         #when the server is in production, Bad Request won't
         #reach the client, instead, a page describing the error
         #will be displayed.
-        #See app.py, templates/error.jinja and bad_request.jinja
+        #See frontend_app.py, templates/error.jinja and bad_request.jinja
         #for a better understanding
         p = self.wait_submit('p')
         assert json.loads(p.text.replace("'", "\"")) == {'description':'Invalid firstname'}
