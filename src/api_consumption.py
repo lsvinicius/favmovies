@@ -1,11 +1,6 @@
 import requests
 from src.custom_log import custom_logger
-#Restful API address config
-HOST_ADDRESS = 'localhost'
-PORT = '5001'
-HTTP_ADDRESS = 'http://' + HOST_ADDRESS + ':' + PORT
-FAVMOVIES_RESTFUL_PATH = '/restful/favmovies'
-FULL_ADDRESS = HTTP_ADDRESS+FAVMOVIES_RESTFUL_PATH
+from src import settings
 
 def query_omdb(params):
     response = {'Response':False,'Error':'Something went wrong.'}
@@ -18,7 +13,7 @@ def query_omdb(params):
 
 def favmovies_call(user, method='GET', params=None):
     response = {'Response':False, 'Error':'Something went wrong.'}
-    request_address = FULL_ADDRESS+'/'+user.get_id()
+    request_address = settings.FULL_ADDRESS+'/'+user.get_id()
     try:
         if method == 'GET':
             if params is None:
