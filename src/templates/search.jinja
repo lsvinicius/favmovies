@@ -2,11 +2,11 @@
 {% block content %}
 <form action="/search" method="post">
     Movie title: <input type="text" name="title"> <br>
-    <input type="submit" value="Search"/>
+    <input name="submit" type="submit" value="Search"/>
 </form>
 {% if response %}
   {% if response.get('Response') %}
-    <form action="/favmovies" method="POST">
+    <form id="search_response" action="/favmovies" method="POST">
         <ul>
         {% for movie in response.get('Search') %}
             <li>
@@ -16,7 +16,7 @@
             </li>
         {% endfor %}
         </ul>
-        <input type="submit" value="Add checkeds to favs"/>
+        <input name="add_movies" type="submit" value="Add checkeds to favs"/>
     </form>
   {% else %}
     <p>{{ response.get("Error") }}</p>

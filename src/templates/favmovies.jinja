@@ -6,7 +6,7 @@
         <ul>
             {% for movie in response.get('favmovies') %}
                 <li>
-                    <a href="http://localhost:5000/favmovies/{{movie['imdbID']}}">
+                    <a name="poster_link" href="http://localhost:5000/favmovies/{{movie['imdbID']}}">
                         <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
                     </a> <br>
                     {{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}} <br>
