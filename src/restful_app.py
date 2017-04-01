@@ -6,6 +6,7 @@ from flask import Flask, jsonify
 from src import database, custom_log, settings
 from src.api.favmovies import favmovies
 
+
 def create_restful_app(database_uri='sqlite:////tmp/default.db'):
     restful_app = Flask(__name__)
     custom_log.init_logger(restful_app.logger)
@@ -14,12 +15,14 @@ def create_restful_app(database_uri='sqlite:////tmp/default.db'):
     restful_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     return restful_app
 
-#logging
-logger_handler = RotatingFileHandler('restful.log', maxBytes=1000000, backupCount=1)
+# logging
+logger_handler = RotatingFileHandler('restful.log', maxBytes=1000000,
+                                     backupCount=1)
 logger_handler.setLevel(logging.INFO)
-#restful initialization
+# restful initialization
 restful_app = create_restful_app()
 restful_app.logger.addHandler(logger_handler)
+
 
 @restful_app.errorhandler(404)
 @restful_app.errorhandler(401)

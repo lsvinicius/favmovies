@@ -6,8 +6,9 @@ from src.api_consumption import query_omdb
 from src.custom_log import custom_logger
 
 favmovies = Blueprint('favmovies', __name__, template_folder='templates')
-MOVIE_NOT_FOUND = {'Response':'Movie not found'}
-USER_NOT_FOUND = {'Response':'User not found'}
+MOVIE_NOT_FOUND = {'Response': 'Movie not found'}
+USER_NOT_FOUND = {'Response': 'User not found'}
+
 
 @favmovies.route('/restful/favmovies/<user_id>', methods=['GET'])
 def favmovies_get(user_id):
@@ -19,17 +20,20 @@ def favmovies_get(user_id):
         custom_logger('favmovies_get: user id {} not found'.format(user_id))
         return jsonify(USER_NOT_FOUND)
 
+
 @favmovies.route('/restful/favmovies/<user_id>/<imdbID>', methods=['GET'])
 def favmovies_get_single(user_id, imdbID):
     user = User.query.get(user_id)
     if user:
         movie = user.get_movie_by_imdbID(imdbID)
         if movie:
-            return jsonify(movie.serialize) if movie is not None else jsonify({})
+            return jsonify(movie.serialize) if movie is not None\
+                                            else jsonify({})
         else:
             return jsonify(MOVIE_NOT_FOUND)
     else:
         return jsonify(USER_NOT_FOUND)
+
 
 @favmovies.route('/restful/favmovies/<user_id>', methods=['POST'])
 def favmovies_post(user_id):
@@ -42,14 +46,18 @@ def favmovies_post(user_id):
         result = query_omdb({'i': imdbID})
         if result.get('Response') == "True":
             movie = Movie(imdbID=result['imdbID'],
-                          title=result['Title'], plot=result['Plot'], type=result['Type'], poster=result['Poster'], year=result['Year'], comment='')
+                          title=result['Title'], plot=result['Plot'],
+                          type=result['Type'], poster=result['Poster'],
+                          year=result['Year'], comment='')
             if user.get_movie_by_imdbID(movie.imdbID) is None:
                 user.movies.append(movie)
                 added_movies.append(movie)
         else:
-            custom_logger('favmovies_post: movie id {} not found'.format(imdbID))
+            custom_logger('favmovies_post: movie id {} not'
+                          ' found'.format(imdbID))
     db.session.commit()
     return jsonify(added_movies=[movie.serialize for movie in added_movies])
+
 
 @favmovies.route('/restful/favmovies/<user_id>/<imdbID>', methods=['PUT'])
 def favmovies_put(user_id, imdbID):
@@ -59,11 +67,12 @@ def favmovies_put(user_id, imdbID):
         if movie:
             movie.comment = request.form['comment']
             db.session.commit()
-            return jsonify({'Response':'Updated successfully'})
+            return jsonify({'Response': 'Updated successfully'})
         else:
             return jsonify(MOVIE_NOT_FOUND)
     else:
         return jsonify(USER_NOT_FOUND)
+
 
 @favmovies.route('/restful/favmovies/<user_id>/<imdbID>', methods=['DELETE'])
 def favmovies_delete(user_id, imdbID):
@@ -73,7 +82,7 @@ def favmovies_delete(user_id, imdbID):
         if movie:
             db.session.delete(movie)
             db.session.commit()
-            return jsonify({'Response':'Deleted successfully'})
+            return jsonify({'Response': 'Deleted successfully'})
         else:
             return jsonify(MOVIE_NOT_FOUND)
     else:

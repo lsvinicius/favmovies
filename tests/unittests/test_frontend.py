@@ -14,13 +14,16 @@ import os
 import subprocess
 
 login_manager = LoginManager()
-#this is the same as in app.load_user, I only
-#put it here in order to test login access,
-#since I must have a user_loader callback
-#defined for login_manager
+
+
+# this is the same as in app.load_user, I only
+# put it here in order to test login access,
+# since I must have a user_loader callback
+# defined for login_manager
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(id)
+
 
 class BaseDo(LiveServerTestCase):
 
@@ -33,12 +36,13 @@ class BaseDo(LiveServerTestCase):
             login_manager.login_view = 'site_views.login'
             database.db.init_app(app)
         else:
-            app = None #force break
+            app = None  # force break
         return app
 
-    def setUp(self, firefoxProfile = None):
+    def setUp(self, firefoxProfile=None):
         database.db.create_all()
-        user = User(name='Vinicius Silva', email='vinicius5@gmail.com', password=hash_password('admin'))
+        user = User(name='Vinicius Silva', email='vinicius5@gmail.com',
+                    password=hash_password('admin'))
         database.db.session.add(user)
         database.db.session.commit()
         self.app = self.create_app()
@@ -55,13 +59,14 @@ class BaseDo(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        #this process will be used to start the restful_app.
-        #this is done as a new process instead of running
-        #inside within the current process because
-        #when frontend_app calls requests methods
-        #to restful_app and they are both in the same process,
+        # this process will be used to start the restful_app.
+        # this is done as a new process instead of running
+        # inside within the current process because
+        # when frontend_app calls requests methods
+        # to restful_app and they are both in the same process,
         # the requests method loops forever
-        cls.restful_app = subprocess.Popen(['python3', '-m', 'src.restful_app', 'TEST'], stdout=subprocess.PIPE)
+        cls.restful_app = subprocess.Popen(['python3', '-m', 'src.restful_app',
+                                            'TEST'], stdout=subprocess.PIPE)
 
     @classmethod
     def tearDownClass(cls):
@@ -125,20 +130,36 @@ class BaseDo(LiveServerTestCase):
         except TimeoutException:
             assert False, 'Timeout'
 
+
 class FrontendTest(BaseDo):
-    #using constant http:/localhost below because it makes no sense to run #these tests outside the local address
+    # using constant http:/localhost below because it makes no sense to run
+    # these tests outside the local address
     def test_index_not_logged(self):
         self.browser.get('http://localhost:'+self.port)
         element = self.browser.find_element_by_tag_name('body')
         p_val = element.find_element_by_tag_name('p')
         links = element.find_elements_by_tag_name('a')
-        assert p_val.text == 'We save your favorite movies, so you never forget them'
-        assert links[0].get_attribute('href') == 'http://localhost:'+self.port+'/' and links[1].get_attribute('href') == 'http://localhost:'+self.port+'/register' and links[2].get_attribute('href') == 'http://localhost:'+self.port+'/login'
+        assert p_val.text == 'We save your favorite movies,'\
+                             ' so you never forget them'
+        assert links[0].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/'
+        assert links[1].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/register'
+        assert links[2].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/login'
 
     def test_index_logged(self):
         p = self.do_login()
         links = self.browser.find_elements_by_tag_name('a')
-        assert p.text == 'Welcome Vinicius Silva' and links[0].get_attribute('href') == 'http://localhost:'+self.port+'/' and links[1].get_attribute('href') == 'http://localhost:'+self.port+'/search' and links[2].get_attribute('href') == 'http://localhost:'+self.port+'/favmovies' and links[3].get_attribute('href') == 'http://localhost:'+self.port+'/logout'
+        assert p.text == 'Welcome Vinicius Silva'
+        assert links[0].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/'
+        assert links[1].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/search'
+        assert links[2].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/favmovies'
+        assert links[3].get_attribute('href') ==\
+            'http://localhost:'+self.port+'/logout'
 
     def test_add_movies(self):
         self.do_add_movies()
@@ -158,7 +179,7 @@ class FrontendTest(BaseDo):
         textarea = self.browser.find_elements_by_tag_name('textarea')[0]
         assert textarea.text == user_comment
 
-    #TODO test movie deletion
+    # TODO test movie deletion
 
     def get_register_form_elements(self):
         self.browser.get('http://localhost:'+self.port+'/register')
@@ -174,22 +195,25 @@ class FrontendTest(BaseDo):
         return (firstname, lastname, password, email, submit)
 
     def test_register_with_invalid_firstname(self):
-        firstname, lastname, password, email, submit = self.get_register_form_elements()
+        firstname, lastname, password, email, submit =\
+            self.get_register_form_elements()
         firstname.send_keys('0123')
         submit.click()
-        #The returned content is not handled by method
-        #frontend_app.bad_request_handler.
-        #For the current situation, we will handle the
-        #Bad Request issued by Firefox manually, however,
-        #when the server is in production, Bad Request won't
-        #reach the client, instead, a page describing the error
-        #will be displayed.
-        #See frontend_app.py, templates/error.jinja and bad_request.jinja
-        #for a better understanding
+        # The returned content is not handled by method
+        # frontend_app.bad_request_handler.
+        # For the current situation, we will handle the
+        # Bad Request issued by Firefox manually, however,
+        # when the server is in production, Bad Request won't
+        # reach the client, instead, a page describing the error
+        # will be displayed.
+        # See frontend_app.py, templates/error.jinja and bad_request.jinja
+        # for a better understanding
         p = self.wait_submit('p')
-        assert json.loads(p.text.replace("'", "\"")) == {'description':'Invalid firstname'}
+        assert json.loads(p.text.replace("'", "\"")) ==\
+            {'description': 'Invalid firstname'}
 
-    #TODO test other invalid fields when registering a new user
+    # TODO test other invalid fields when registering a new user
+
 
 class FrontendTestWithoutJavascript(BaseDo):
 
@@ -197,11 +221,14 @@ class FrontendTestWithoutJavascript(BaseDo):
         profile = webdriver.FirefoxProfile()
         profile.set_preference('javascript.enabled', False)
         profile.add_extension('tests/extensions/quickjava-2.1.2-fx.xpi')
-        profile.set_preference('extensions.thatoneguydotnet.QuickJava.startupStatus.JavaScript', 2)
-        profile.set_preference('extensions.thatoneguydotnet.QuickJava.curVersion', '2.1.2')
+        profile.set_preference('extensions.thatoneguydotnet.QuickJava.'
+                               'startupStatus.JavaScript', 2)
+        profile.set_preference('extensions.thatoneguydotnet.QuickJava.'
+                               'curVersion', '2.1.2')
         super(FrontendTestWithoutJavascript, self).setUp(profile)
 
     def test_single_movie_without_javascript(self):
         self.do_click_movie()
         warning = self.browser.find_element_by_id('warning')
-        assert warning is not None and warning.text == "Delete and Update won't work"
+        assert warning is not None
+        assert warning.text == "Delete and Update won't work"
