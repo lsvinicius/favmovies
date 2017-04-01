@@ -2,7 +2,10 @@ window.onload = function() {
     var delete_button = document.getElementById("delete");
     var update_button = document.getElementById("update");
     var address = document.getElementById("address").getAttribute("href");
-    var return_address = 'http://localhost:5000/favmovies';
+    var return_address = window.location.href;
+    var col_pos = return_address.indexOf(':');
+    var last_path_slash = col_pos + return_address.substring(col_pos).indexOf('/');
+    return_address = return_address.slice(0,last_path_slash)+'/favmovies';
     var warning = document.getElementById("warning");
     warning.parentNode.removeChild(warning);
     delete_button.onclick = function() {

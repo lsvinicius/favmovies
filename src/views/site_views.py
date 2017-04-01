@@ -7,6 +7,7 @@ from src.password import hash_password
 from src.api_consumption import query_omdb, favmovies_call
 from src.views.form_validators import valid_register_form
 from src.custom_log import custom_logger
+from src import settings
 site_views = Blueprint('site_views', __name__, template_folder='templates')
 
 @site_views.route('/', methods=['GET', 'POST'])
@@ -85,11 +86,11 @@ def favmovies(imdbID=None):
         if imdbID is None:
             custom_logger('favmovies: client issued GET request for movies list')
             response = favmovies_call(user=current_user)
-            return render_template('favmovies.jinja', response=response)
+            return render_template('favmovies.jinja', response=response, address=settings.HOST_ADDRESS, frontend_port=settings.FRONTEND_PORT)
         else:
             custom_logger('favmovies: client issued GET request for single movie')
             response = favmovies_call(user=current_user, params={'imdbID':imdbID})
-            return render_template('favmovie_single.jinja', movie=response)
+            return render_template('favmovie_single.jinja', address=settings.HOST_ADDRESS, frontend_port = settings.FRONTEND_PORT, movie=response)
     elif request.method == 'POST':
         response = favmovies_call(user=current_user, method='POST', params=request.form.getlist('movies'))
         return redirect(url_for('site_views.logged'))

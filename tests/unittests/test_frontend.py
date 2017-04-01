@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from src import frontend_app
-from src import database
+from src import database, settings
 from src.model.user import User
 from src.password import hash_password
 import os
@@ -25,11 +25,15 @@ def load_user(id):
 class BaseDo(LiveServerTestCase):
 
     def create_app(self):
-        app = frontend_app.create_frontend_app()
-        app.secret_key = os.urandom(24)
-        login_manager.init_app(app)
-        login_manager.login_view = 'site_views.login'
-        database.db.init_app(app)
+        app = frontend_app.create_frontend_app('sqlite:////tmp/test.db')
+        if settings.init('TEST'):
+            app.config['LIVESERVER_PORT'] = int(settings.FRONTEND_PORT)
+            app.secret_key = os.urandom(24)
+            login_manager.init_app(app)
+            login_manager.login_view = 'site_views.login'
+            database.db.init_app(app)
+        else:
+            app = None #force break
         return app
 
     def setUp(self, firefoxProfile = None):
@@ -38,6 +42,7 @@ class BaseDo(LiveServerTestCase):
         database.db.session.add(user)
         database.db.session.commit()
         self.app = self.create_app()
+        self.port = settings.FRONTEND_PORT
         if not firefoxProfile:
             self.browser = webdriver.Firefox()
         else:
@@ -56,7 +61,7 @@ class BaseDo(LiveServerTestCase):
         #when frontend_app calls requests methods
         #to restful_app and they are both in the same process,
         # the requests method loops forever
-        cls.restful_app = subprocess.Popen(['python3', '-m', 'src.restful_app'], stdout=subprocess.PIPE)
+        cls.restful_app = subprocess.Popen(['python3', '-m', 'src.restful_app', 'TEST'], stdout=subprocess.PIPE)
 
     @classmethod
     def tearDownClass(cls):
@@ -77,7 +82,7 @@ class BaseDo(LiveServerTestCase):
         return None
 
     def do_login(self, email='vinicius5@gmail.com', password='admin'):
-        self.browser.get('http://localhost:5000/login')
+        self.browser.get('http://localhost:'+self.port+'/login')
         email = self.browser.find_element_by_name('email')
         password = self.browser.find_element_by_name('password')
         submit = self.browser.find_element_by_name('submit')
@@ -89,7 +94,7 @@ class BaseDo(LiveServerTestCase):
 
     def do_search(self, title='matrix'):
         self.do_login()
-        self.browser.get('http://localhost:5000/search')
+        self.browser.get('http://localhost:'+self.port+'/search')
         search = self.browser.find_element_by_name('title')
         submit = self.browser.find_element_by_name('submit')
         search.send_keys(title)
@@ -108,7 +113,7 @@ class BaseDo(LiveServerTestCase):
 
     def do_click_movie(self):
         self.do_add_movies()
-        self.browser.get('http://localhost:5000/favmovies')
+        self.browser.get('http://localhost:'+self.port+'/favmovies')
         movies = self.browser.find_elements_by_name('poster_link')[0].click()
         self.wait_submit('delete', By.ID)
 
@@ -120,25 +125,24 @@ class BaseDo(LiveServerTestCase):
         except TimeoutException:
             assert False, 'Timeout'
 
-
 class FrontendTest(BaseDo):
-
+    #using constant http:/localhost below because it makes no sense to run #these tests outside the local address
     def test_index_not_logged(self):
-        self.browser.get('http://localhost:5000')
+        self.browser.get('http://localhost:'+self.port)
         element = self.browser.find_element_by_tag_name('body')
         p_val = element.find_element_by_tag_name('p')
         links = element.find_elements_by_tag_name('a')
         assert p_val.text == 'We save your favorite movies, so you never forget them'
-        assert links[0].get_attribute('href') == 'http://localhost:5000/' and links[1].get_attribute('href') == 'http://localhost:5000/register' and links[2].get_attribute('href') == 'http://localhost:5000/login'
+        assert links[0].get_attribute('href') == 'http://localhost:'+self.port+'/' and links[1].get_attribute('href') == 'http://localhost:'+self.port+'/register' and links[2].get_attribute('href') == 'http://localhost:'+self.port+'/login'
 
     def test_index_logged(self):
         p = self.do_login()
         links = self.browser.find_elements_by_tag_name('a')
-        assert p.text == 'Welcome Vinicius Silva' and links[0].get_attribute('href') == 'http://localhost:5000/' and links[1].get_attribute('href') == 'http://localhost:5000/search' and links[2].get_attribute('href') == 'http://localhost:5000/favmovies' and links[3].get_attribute('href') == 'http://localhost:5000/logout'
+        assert p.text == 'Welcome Vinicius Silva' and links[0].get_attribute('href') == 'http://localhost:'+self.port+'/' and links[1].get_attribute('href') == 'http://localhost:'+self.port+'/search' and links[2].get_attribute('href') == 'http://localhost:'+self.port+'/favmovies' and links[3].get_attribute('href') == 'http://localhost:'+self.port+'/logout'
 
     def test_add_movies(self):
         self.do_add_movies()
-        self.browser.get('http://localhost:5000/favmovies')
+        self.browser.get('http://localhost:'+self.port+'/favmovies')
         movies = self.browser.find_elements_by_tag_name('li')
         assert len(movies) == 3
 
@@ -150,14 +154,14 @@ class FrontendTest(BaseDo):
         comment.send_keys(user_comment)
         self.browser.find_element_by_id('update').click()
         self.do_accept_alert()
-        self.browser.get('http://localhost:5000/favmovies')
+        self.browser.get('http://localhost:'+self.port+'/favmovies')
         textarea = self.browser.find_elements_by_tag_name('textarea')[0]
         assert textarea.text == user_comment
 
     #TODO test movie deletion
 
     def get_register_form_elements(self):
-        self.browser.get('http://localhost:5000/register')
+        self.browser.get('http://localhost:'+self.port+'/register')
         firstname = self.browser.find_element_by_name('firstname')
         lastname = self.browser.find_element_by_name('lastname')
         password = self.browser.find_element_by_name('password')

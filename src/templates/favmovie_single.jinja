@@ -5,7 +5,7 @@
 {%endblock%}
 {%block content%}
     <div id="movie">
-        <a id="address" href="http://localhost:5000/favmovies/{{movie['imdbID']}}">
+        <a id="address" href="http://{{address}}:{{frontend_port}}/favmovies/{{movie['imdbID']}}">
             <img src="{{ movie['Poster'] }}" alt="poster image" width="150" height="200"/>
         </a> <br>
         <p>{{ movie['Title'] }} - {{movie['Year']}} - {{ movie['Type']}}</p>
