@@ -1,6 +1,5 @@
 {%extends 'base.jinja'%}
 {%block scripts%}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/static/js/request.js"></script>
 <noscript>Your browser doesn't have javascript enabled. Enable it in order to delete or comment the move</noscript>
 {%endblock%}
@@ -13,6 +12,7 @@
         <p>{{ movie['Plot'] }}</p>
         <textarea rows="4" cols="50" id="comment">{{ movie['Comment'] }}</textarea><br>
         <button id="delete">Delete me</button>
-        <button id="update">Update me</button>
+        <button id="update">Update me</button><br>
+        <h4 id="warning" style="color:red">Delete and Update won't work</h4>
     </div>
 {% endblock %}

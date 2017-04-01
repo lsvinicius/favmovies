@@ -3,6 +3,8 @@ window.onload = function() {
     var update_button = document.getElementById("update");
     var address = document.getElementById("address").getAttribute("href");
     var return_address = 'http://localhost:5000/favmovies';
+    var warning = document.getElementById("warning");
+    warning.parentNode.removeChild(warning);
     delete_button.onclick = function() {
         var request = new XMLHttpRequest();
         request.open('DELETE', address, false);
